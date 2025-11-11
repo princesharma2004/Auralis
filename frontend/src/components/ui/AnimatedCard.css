@@ -1,0 +1,80 @@
+/* container has perspective set in component; this file handles inner transforms & glare */
+.animated-card {
+  perspective: 1000px;
+}
+
+/* initial hidden state (for entrance) */
+.card-hidden {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 520ms cubic-bezier(0.2, 0.9, 0.2, 1),
+    transform 520ms cubic-bezier(0.2, 0.9, 0.2, 1);
+}
+
+/* visible state for entrance */
+.card-visible {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 520ms cubic-bezier(0.2, 0.9, 0.2, 1),
+    transform 520ms cubic-bezier(0.2, 0.9, 0.2, 1);
+}
+
+/* inner container that will tilt */
+.card-inner {
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  position: relative;
+  overflow: hidden;
+  transition: box-shadow 280ms ease,
+    transform 280ms cubic-bezier(0.2, 0.9, 0.2, 1);
+}
+
+/* subtle inner border glow */
+.card-inner::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.02),
+    rgba(0, 0, 0, 0.02)
+  );
+  mix-blend-mode: overlay;
+}
+
+/* glare / sheen element */
+.card-glare {
+  position: absolute;
+  top: -40%;
+  left: -40%;
+  width: 180%;
+  height: 180%;
+  background: radial-gradient(
+    600px 300px at 30% 30%,
+    rgba(255, 255, 255, 0.35),
+    rgba(255, 255, 255, 0.08),
+    transparent 40%
+  );
+  transform: translate(0, 0);
+  opacity: 0;
+  transition: transform 160ms ease, opacity 200ms ease;
+  z-index: 1;
+  filter: blur(18px);
+  mix-blend-mode: screen;
+}
+
+/* keep content above glare */
+.card-inner > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* responsive tweak */
+@media (max-width: 640px) {
+  .card-inner {
+    padding: 1.25rem;
+  }
+}
