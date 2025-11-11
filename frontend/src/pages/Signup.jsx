@@ -1,16 +1,17 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "./Login.css";
+import "../styles/Signup.css";
 import Aurora from "../components/common/Aurora";
 
-const ROLES = ["Admin", "Recruiter", "Candidate"];
+const ROLES = ["Recruiter", "Candidate"];
 
-export default function Login() {
+export default function Signup() {
   const [role, setRole] = useState("Candidate");
   const [form, setForm] = useState({
+    name: "",
     email: "",
     password: "",
-    adminCode: "",
+    confirmPassword: "",
     companyName: "",
     phone: "",
   });
@@ -21,30 +22,30 @@ export default function Login() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Build payload depending on role
+
+    if (form.password !== form.confirmPassword) {
+      alert("Passwords do not match");
+      return;
+    }
+
     const payload = {
       role,
+      name: form.name,
       email: form.email,
       password: form.password,
-      ...(role === "Admin" ? { adminCode: form.adminCode } : {}),
       ...(role === "Recruiter" ? { companyName: form.companyName } : {}),
       ...(role === "Candidate" ? { phone: form.phone } : {}),
     };
 
-    console.log("Login payload:", payload);
-    // TODO: call auth API with payload
-    // On success:
+    console.log("Signup payload:", payload);
+    // TODO: Send to API
     navigate("/home");
   };
 
-  const roleAccent = {
-    Admin: "admin",
-    Recruiter: "recruiter",
-    Candidate: "candidate",
-  }[role];
+  const roleAccent = role === "Recruiter" ? "recruiter" : "candidate";
 
   return (
-    <div className="auralis-login-root">
+    <div className="auralis-signup-root">
       {/* Aurora Background */}
       <div className="auralis-aurora-bg">
         <Aurora
@@ -55,37 +56,60 @@ export default function Login() {
         />
       </div>
 
-      {/* Content: frosted login card */}
-      <div className="auralis-login-container">
-        <div className={`auralis-login-card ${roleAccent}`}>
-          {/* Role segmented control */}
+      {/* Signup card */}
+      <div className="auralis-signup-container">
+        <div
+          className={`auralis-signup-card ${roleAccent}`}
+          data-role={role.toLowerCase()}
+        >
+          {/* Role toggle */}
           <div className="role-toggle" role="tablist" aria-label="Select role">
-            {ROLES.map((r) => (
+            {ROLES.map((r, idx) => (
               <button
                 key={r}
                 className={`role-btn ${r === role ? "active" : ""}`}
                 onClick={() => setRole(r)}
                 type="button"
                 aria-pressed={r === role}
+                data-index={idx}
               >
                 {r}
               </button>
             ))}
+
+            <div
+              className="role-indicator"
+              style={{
+                transform: `translateX(${ROLES.indexOf(role) * 100}%)`,
+              }}
+              aria-hidden
+            />
           </div>
 
           {/* Title */}
-          <h1 className="auralis-login-title">
-            {role === "Candidate" ? "Welcome Back" : `${role} Sign In`}
+          <h1 className="auralis-signup-title">
+            {role === "Candidate"
+              ? "Create your Candidate account"
+              : "Create your Recruiter account"}
           </h1>
-          <p className="auralis-login-sub">
-            {role === "Admin" && "Sign in with your admin credentials."}
-            {role === "Recruiter" &&
-              "Sign in to manage job postings and candidates."}
-            {role === "Candidate" &&
-              "Sign in to apply for roles and track applications."}
+          <p className="auralis-signup-sub">
+            {role === "Recruiter"
+              ? "Sign up to post jobs and manage candidates."
+              : "Sign up to apply for jobs and track applications."}
           </p>
 
-          <form className="auralis-login-form" onSubmit={handleSubmit}>
+          {/* Form */}
+          <form className="auralis-signup-form" onSubmit={handleSubmit}>
+            <input
+              name="name"
+              type="text"
+              placeholder="Full Name"
+              value={form.name}
+              onChange={handleChange}
+              required
+              className="auralis-input"
+            />
+
             <input
               name="email"
               type="email"
@@ -106,19 +130,21 @@ export default function Login() {
               className="auralis-input"
             />
 
-            {/* Role-specific inputs */}
-            {role === "Admin" && (
-              <input
-                name="adminCode"
-                type="text"
-                placeholder="Admin Code"
-                value={form.adminCode}
-                onChange={handleChange}
-                className="auralis-input"
-              />
-            )}
+            <input
+              name="confirmPassword"
+              type="password"
+              placeholder="Confirm Password"
+              value={form.confirmPassword}
+              onChange={handleChange}
+              required
+              className="auralis-input"
+            />
 
-            {role === "Recruiter" && (
+            {/* Role-specific input panels */}
+            <div
+              className={`field-panel ${role === "Recruiter" ? "open" : ""}`}
+              aria-hidden={role !== "Recruiter"}
+            >
               <input
                 name="companyName"
                 type="text"
@@ -126,10 +152,14 @@ export default function Login() {
                 value={form.companyName}
                 onChange={handleChange}
                 className="auralis-input"
+                required={role === "Recruiter"}
               />
-            )}
+            </div>
 
-            {role === "Candidate" && (
+            <div
+              className={`field-panel ${role === "Candidate" ? "open" : ""}`}
+              aria-hidden={role !== "Candidate"}
+            >
               <input
                 name="phone"
                 type="tel"
@@ -138,14 +168,14 @@ export default function Login() {
                 onChange={handleChange}
                 className="auralis-input"
               />
-            )}
+            </div>
 
             <button type="submit" className="auralis-btn-primary">
-              Log In as {role}
+              Sign Up as {role}
             </button>
           </form>
 
-          <div className="auralis-login-footer">
+          <div className="auralis-signup-footer">
             <button
               className="auralis-link-btn"
               onClick={() => navigate("/home")}
@@ -155,10 +185,10 @@ export default function Login() {
             </button>
             <button
               className="auralis-link-btn"
-              onClick={() => navigate("/signup")}
+              onClick={() => navigate("/login")}
               type="button"
             >
-              Create account
+              Already have an account? Log In
             </button>
           </div>
         </div>
