@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/Signup.css";
 import Aurora from "../components/common/Aurora";
+import MainLayout from "../layouts/MainLayout";
 
 const ROLES = ["Recruiter", "Candidate"];
 
@@ -12,8 +13,6 @@ export default function Signup() {
     email: "",
     password: "",
     confirmPassword: "",
-    companyName: "",
-    phone: "",
   });
   const navigate = useNavigate();
 
@@ -45,7 +44,8 @@ export default function Signup() {
   const roleAccent = role === "Recruiter" ? "recruiter" : "candidate";
 
   return (
-    <div className="auralis-signup-root">
+    <MainLayout>
+      <div className="auralis-signup-root">
       {/* Aurora Background */}
       <div className="auralis-aurora-bg">
         <Aurora
@@ -140,36 +140,6 @@ export default function Signup() {
               className="auralis-input"
             />
 
-            {/* Role-specific input panels */}
-            <div
-              className={`field-panel ${role === "Recruiter" ? "open" : ""}`}
-              aria-hidden={role !== "Recruiter"}
-            >
-              <input
-                name="companyName"
-                type="text"
-                placeholder="Company Name"
-                value={form.companyName}
-                onChange={handleChange}
-                className="auralis-input"
-                required={role === "Recruiter"}
-              />
-            </div>
-
-            <div
-              className={`field-panel ${role === "Candidate" ? "open" : ""}`}
-              aria-hidden={role !== "Candidate"}
-            >
-              <input
-                name="phone"
-                type="tel"
-                placeholder="Phone (optional)"
-                value={form.phone}
-                onChange={handleChange}
-                className="auralis-input"
-              />
-            </div>
-
             <button type="submit" className="auralis-btn-primary">
               Sign Up as {role}
             </button>
@@ -194,5 +164,6 @@ export default function Signup() {
         </div>
       </div>
     </div>
+    </MainLayout>
   );
 }
