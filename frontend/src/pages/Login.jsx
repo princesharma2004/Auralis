@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "../styles/Login.css";
 import Aurora from "../components/common/Aurora";
 import MainLayout from "../layouts/MainLayout";
-import login from "../services/login"
+import login from "../services/login";
 
 export default function Login() {
   const [form, setForm] = useState({
@@ -80,11 +80,12 @@ export default function Login() {
             
             <div className="auralis-login-footer">
               <button
-                className="auralis-link-btn"
+                className="auralis-link-btn group transition-all duration-300 flex items-center gap-2"
                 onClick={() => navigate("/home")}
                 type="button"
               >
-                ← Back to Home
+                <span className="transition-transform duration-300 group-hover:-translate-x-1">←</span>
+                Back to Home
               </button>
               <button
                 className="auralis-link-btn"
