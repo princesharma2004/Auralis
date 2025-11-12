@@ -115,7 +115,7 @@ export default function About()
             </p>
           </div>
 
-          <div className="flex justify-center gap-20">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-10 justify-items-center">
             <ProfileCard
               name="Prince Sharma"
               title="Software Engineer"
@@ -140,6 +140,19 @@ export default function About()
               enableTilt={true}
               enableMobileTilt={true}
               onContactClick={() => window.open("https://github.com/yash825-bit", "_blank")}
+            />
+
+            <ProfileCard
+              name="Sumit Singh"
+              title="ML Engineer"
+              handle="SumitSJ-2004"
+              contactText="Github Profile"
+              iconUrl="https://github.com/SumitSJ-2004.png"
+              avatarUrl="https://github.com/SumitSJ-2004.png"
+              showUserInfo={true}
+              enableTilt={true}
+              enableMobileTilt={true}
+              onContactClick={() => window.open("https://github.com/SumitSJ-2004", "_blank")}
             />
           </div>
           
