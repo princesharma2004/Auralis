@@ -12,6 +12,10 @@ load_dotenv()
 class Settings(BaseSettings):
     """Application configuration settings."""
 
+    CORS_ORIGIN: str = Field(
+        default_factory=lambda: getenv("CORS_ORIGINS", "http://localhost:5173")
+    )
+
     DATABASE_URL: str = Field(
         default_factory=lambda: getenv("DATABASE_URL", "sqlite+aiosqlite:///./test.db")
     )

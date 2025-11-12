@@ -1,0 +1,137 @@
+:root {
+  --motion-fast: 160ms;
+  --motion-medium: 280ms;
+  --card-bg: rgba(18, 18, 20, 0.45);
+}
+
+/* Root & aurora backdrop */
+.auralis-login-root {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+  background: #000;
+}
+
+.auralis-aurora-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Container */
+.auralis-login-container {
+  position: relative;
+  z-index: 5;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 48px 20px;
+}
+
+/* Card base */
+.auralis-login-card {
+  width: 500px;
+  max-width: calc(100% - 40px);
+  padding: 28px;
+  border-radius: 18px;
+  background: var(--card-bg);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(12px) saturate(120%);
+  color: #eaf2ff;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: border-color var(--motion-medium) ease,
+    box-shadow var(--motion-medium) ease, transform var(--motion-medium) ease;
+}
+
+/* Title & subtitle */
+.auralis-login-title {
+  margin: 6px 0 4px;
+  font-size: 26px;
+  color: #cfe8ff;
+  font-weight: 700;
+}
+.auralis-login-sub {
+  margin: 0 0 12px;
+  font-size: 13px;
+  color: rgba(220, 240, 255, 0.8);
+}
+
+/* Inputs */
+.auralis-input {
+  width: 100%;
+  padding: 12px 14px;
+  margin: 6px 0;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.02);
+  color: #eaf2ff;
+  font-size: 14px;
+  box-sizing: border-box;
+  outline: none;
+  transition: box-shadow var(--motion-fast) ease,
+    border-color var(--motion-fast) ease;
+}
+.auralis-input::placeholder {
+  color: rgba(230, 245, 255, 0.45);
+}
+
+/* Primary button */
+.auralis-btn-primary {
+  width: 100%;
+  padding: 12px 16px;
+  margin-top: 6px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(
+    90deg,
+    rgba(58, 41, 255, 0.14),
+    rgba(32, 170, 255, 0.06)
+  );
+  color: #eaf2ff;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.55);
+  transition: transform var(--motion-fast) ease,
+    box-shadow var(--motion-fast) ease;
+}
+.auralis-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.6);
+}
+
+/* Footer links */
+.auralis-login-footer {
+  margin-top: 8px;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+}
+.auralis-link-btn {
+  background: transparent;
+  border: none;
+  color: rgba(190, 220, 255, 0.85);
+  cursor: pointer;
+  font-size: 13px;
+  padding: 6px;
+}
+.auralis-link-btn:hover {
+  text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .auralis-login-card {
+    width: 92%;
+    padding: 20px;
+  }
+  .auralis-login-title {
+    font-size: 22px;
+  }
+}

@@ -1,3 +1,4 @@
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI
 from apscheduler.schedulers.background import BackgroundScheduler
 
@@ -6,6 +7,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from api.v1 import candidates
 from api.v1 import recruiters
 from api.v1 import admin
+from api.v1 import user
 from database.base import Base, engine
 from database.session import get_sync_session
 
@@ -33,7 +35,16 @@ app = FastAPI(
     description="FastAPI backend for the Job Portal with Smart Resume–Job Matching",
 )
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[settings.CORS_ORIGIN],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # --- Include routers ---
+app.include_router(user.router, prefix="/api/v1/user", tags=["Candidates", "Recruiters", "Admin"])
 app.include_router(candidates.router, prefix="/api/v1/candidates", tags=["Candidates"])
 app.include_router(recruiters.router, prefix="/api/v1/recruiters", tags=["Recruiters"])
 app.include_router(admin.router, prefix="/api/v1/admin", tags=["Admin"])
