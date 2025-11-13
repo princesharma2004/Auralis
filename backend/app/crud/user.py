@@ -32,14 +32,14 @@ def get_users(db: Session, skip: int = 0, limit: int = 100) -> list[User]:
 
 
 def activate_user(db: Session, user_id: int) -> None:
-    user = get_user(db, user_id)
+    user = db.query(User).filter(User.id == user_id).first()
     if user:
         user.is_active = True
         db.commit()
 
 
 def deactivate_user(db: Session, user_id: int) -> None:
-    user = get_user(db, user_id)
+    user = db.query(User).filter(User.id == user_id).first()
     if user:
         user.is_active = False
         db.commit()

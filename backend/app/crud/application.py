@@ -3,7 +3,7 @@ from typing import Optional, List
 
 from models.application import Application
 
-def apply_for_job(db: Session, candidate_id: int, job_id: int, resume_id: int, cover_letter: Optional[List[str]] = None):
+def apply_for_job(db: Session, candidate_id: int, job_id: int, resume_id: int, cover_letter: Optional[List[str]] = None) -> Application:
     db_app = Application(
         candidate_id=candidate_id,
         job_id=job_id,
@@ -17,15 +17,15 @@ def apply_for_job(db: Session, candidate_id: int, job_id: int, resume_id: int, c
     return db_app
 
 
-def get_applications_by_candidate(db: Session, candidate_id: int):
+def get_applications_by_candidate(db: Session, candidate_id: int) -> List[Application]:
     return db.query(Application).filter(Application.candidate_id == candidate_id).all()
 
 
-def get_applications_by_job(db: Session, job_id: int):
+def get_applications_by_job(db: Session, job_id: int) -> List[Application]:
     return db.query(Application).filter(Application.job_id == job_id).all()
 
 
-def update_application_status(db: Session, application_id: int, new_status: str):
+def update_application_status(db: Session, application_id: int, new_status: str) -> Optional[Application]:
     app = db.query(Application).filter(Application.id == application_id).first()
     if app:
         setattr(app, "status", new_status)

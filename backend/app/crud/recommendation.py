@@ -1,8 +1,9 @@
 from sqlalchemy.orm import Session
+from typing import List
 
 from models.recommendation import Recommendation
 
-def create_recommendation(db: Session, job_id: int, candidate_id: int, resume_id: int, score: float):
+def create_recommendation(db: Session, job_id: int, candidate_id: int, resume_id: int, score: float) -> Recommendation:
     db_rec = Recommendation(
         job_id=job_id,
         candidate_id=candidate_id,
@@ -15,7 +16,7 @@ def create_recommendation(db: Session, job_id: int, candidate_id: int, resume_id
     return db_rec
 
 
-def get_top_candidates_for_job(db: Session, job_id: int, limit: int = 10):
+def get_top_candidates_for_job(db: Session, job_id: int, limit: int = 10) -> List[Recommendation]:
     return (
         db.query(Recommendation)
         .filter(Recommendation.job_id == job_id)
@@ -25,7 +26,7 @@ def get_top_candidates_for_job(db: Session, job_id: int, limit: int = 10):
     )
 
 
-def get_recommended_jobs_for_candidate(db: Session, candidate_id: int, limit: int = 10):
+def get_recommended_jobs_for_candidate(db: Session, candidate_id: int, limit: int = 10) -> List[Recommendation]:
     return (
         db.query(Recommendation)
         .filter(Recommendation.candidate_id == candidate_id)

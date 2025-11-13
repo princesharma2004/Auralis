@@ -3,7 +3,7 @@ from typing import List, Optional
 
 from models.resume import Resume
 
-def create_resume(db: Session, user_id: int, filename: str, storage_path: str, parsed_skills: Optional[List[str]] = None):
+def create_resume(db: Session, user_id: int, filename: str, storage_path: str, parsed_skills: Optional[List[str]] = None) -> Resume:
     db_resume = Resume(
         user_id=user_id,
         filename=filename,
@@ -16,5 +16,5 @@ def create_resume(db: Session, user_id: int, filename: str, storage_path: str, p
     return db_resume
 
 
-def get_resumes_by_user(db: Session, user_id: int):
+def get_resumes_by_user(db: Session, user_id: int) -> List[Resume]:
     return db.query(Resume).filter(Resume.user_id == user_id).all()

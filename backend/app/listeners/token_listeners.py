@@ -1,6 +1,8 @@
 from datetime import datetime, timezone
 from sqlalchemy import event
 from sqlalchemy.orm import Session
+from sqlalchemy.engine import Connection
+from sqlalchemy.orm.mapper import Mapper
 
 from database.session import get_sync_session
 from models.token import Token
@@ -13,7 +15,7 @@ def delete_expired_tokens() -> None:
         db.commit()
 
 @event.listens_for(Token, "before_insert")
-def ensure_single_token(mapper, connection, target: Token):
+def ensure_single_token(mapper: Mapper[Token], connection: Connection, target: Token) -> None:
     """Ensure each user has only one active token — delete old one if exists."""
     session = Session.object_session(target)
     if session:
