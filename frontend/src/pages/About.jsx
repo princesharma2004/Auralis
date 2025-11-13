@@ -144,7 +144,7 @@ export default function About()
 
             <ProfileCard
               name="Sumit Singh"
-              title="ML Engineer"
+              title="Frontend Developer"
               handle="SumitSJ-2004"
               contactText="Github Profile"
               iconUrl="https://github.com/SumitSJ-2004.png"
