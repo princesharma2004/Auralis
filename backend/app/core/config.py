@@ -30,7 +30,9 @@ class Settings(BaseSettings):
         default_factory=lambda: int(getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "1440"))
     )
 
-    ADMINS: List[Dict[str, str]] = json.load(open("core/admins.json", encoding="utf-8")) or []
+    ADMINS: List[Dict[str, str]] = Field(
+        default_factory=lambda: json.load(open("core/admins.json", encoding="utf-8")) or []
+    )
 
     class Config:
         env_file = ".env"

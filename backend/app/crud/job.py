@@ -9,7 +9,6 @@ def create_job(db: Session, recruiter_id: int, job: JobCreate) -> Job:
         recruiter_id=recruiter_id,
         title=job.title,
         description=job.description,
-        required_skills=job.required_skills,
         location=job.location,
         employment_type=job.employment_type,
     )

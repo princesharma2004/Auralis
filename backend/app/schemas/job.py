@@ -1,11 +1,10 @@
 from pydantic import BaseModel
 from datetime import datetime
-from typing import List, Optional
+from typing import Optional
 
 class JobBase(BaseModel):
     title: str
     description: Optional[str]
-    required_skills: Optional[List[str]]
     location: str
     employment_type: Optional[str]
 

@@ -1,5 +1,5 @@
 from sqlalchemy import (
-    Column, Integer, String, Boolean, DateTime, Text, ARRAY, ForeignKey
+    Column, Integer, String, Boolean, DateTime, Text, ForeignKey
 )
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -14,7 +14,6 @@ class Resume(Base):
     filename = Column(String(255))
     storage_path = Column(String(512))
     text_content = Column(Text)
-    parsed_skills = Column(ARRAY(String))
     uploaded_at = Column(DateTime(timezone=True), server_default=func.now())
     is_active = Column(Boolean, default=True)
 

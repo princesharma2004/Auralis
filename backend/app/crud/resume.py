@@ -7,8 +7,7 @@ def create_resume(db: Session, user_id: int, filename: str, storage_path: str, p
     db_resume = Resume(
         user_id=user_id,
         filename=filename,
-        storage_path=storage_path,
-        parsed_skills=parsed_skills or []
+        storage_path=storage_path
     )
     db.add(db_resume)
     db.commit()

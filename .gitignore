@@ -12,7 +12,6 @@ backend/app/crud/__pycache__/job.cpython-313.pyc
 backend/app/crud/__pycache__/token.cpython-313.pyc
 backend/app/crud/__pycache__/user.cpython-313.pyc
 backend/app/core/__pycache__/config.cpython-313.pyc
-backend/app/core/__pycache__/security.cpython-313.pyc
 backend/app/listeners/__pycache__/token_listeners.cpython-313.pyc
 backend/app/listeners/__pycache__/user_listeners.cpython-313.pyc
 backend/app/schemas/__pycache__/job.cpython-313.pyc
@@ -25,3 +24,4 @@ backend/app/api/v1/__pycache__/admin.cpython-313.pyc
 backend/app/api/v1/__pycache__/user.cpython-313.pyc
 backend/app/api/v1/__pycache__/recruiter.cpython-313.pyc
 backend/app/api/v1/__pycache__/candidate.cpython-313.pyc
+backend/app/api/v1/__pycache__/admin.cpython-313.pyc
