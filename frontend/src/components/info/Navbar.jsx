@@ -7,6 +7,7 @@ export default function Navbar() {
 
   const links = [
     { path: "/home", label: "Home" },
+    { path: "/features", label: "Features" },
     { path: "/about", label: "About" },
     { path: "/contact", label: "Contact" },
   ];
@@ -25,11 +26,11 @@ export default function Navbar() {
           onClick={() => navigate("/home")}
         >
           <h1
-          onClick={() => navigate("/home")}
-          className="cursor-pointer text-2xl md:mt-xl font-extrabold bg-gradient-to-r from-[#40ffaa] via-[#4079ff] to-[#40ffaa] bg-[length:300%_300%] animate-gradient-text bg-clip-text text-transparent drop-shadow-lg transition-transform hover:scale-105"
-        >
-          Auralis
-        </h1>
+            onClick={() => navigate("/home")}
+            className="cursor-pointer text-2xl md:mt-xl font-extrabold bg-gradient-to-r from-[#40ffaa] via-[#4079ff] to-[#40ffaa] bg-[length:300%_300%] animate-gradient-text bg-clip-text text-transparent drop-shadow-lg transition-transform hover:scale-105"
+          >
+            Auralis
+          </h1>
         </div>
 
         {/* Center: Navigation Links */}
@@ -54,10 +55,16 @@ export default function Navbar() {
 
         {/* Right: Buttons */}
         <div className="flex gap-3 flex-shrink-0">
-          <button onClick={() => navigate("/login")} className="px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-full border border-white/30 transition">
+          <button
+            onClick={() => navigate("/login")}
+            className="px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-full border border-white/30 transition"
+          >
             Log In
           </button>
-          <button onClick={() => navigate("/signup")} className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full border border-blue-600 transition">
+          <button
+            onClick={() => navigate("/signup")}
+            className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full border border-blue-600 transition"
+          >
             Get Started
           </button>
         </div>

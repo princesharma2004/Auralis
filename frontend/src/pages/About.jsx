@@ -5,6 +5,7 @@ import SpotlightCard from "../components/common/SpotlightCard";
 import ProfileCard from "../components/common/ProfileCard";
 
 export default function About() {
+export default function About() {
   return (
     <MainLayout>
       <main className="relative min-h-screen text-slate-200 overflow-hidden">
@@ -25,6 +26,7 @@ export default function About() {
         <section className="relative z-10 max-w-6xl mx-auto px-6 py-24 flex flex-col items-center text-center">
           {/* Title */}
           <h1 className="text-3xl md:text-4xl font-bold text-center bg-gradient-to-r from-[#40ffaa] via-[#4079ff] to-[#40ffaa] bg-[length:300%_300%] animate-gradient-text bg-clip-text text-transparent drop-shadow-lg">
+          <h1 className="text-3xl md:text-4xl text-center bg-gradient-to-r from-[#40ffaa] via-[#4079ff] to-[#40ffaa] bg-[length:300%_300%] animate-gradient-text bg-clip-text text-transparent drop-shadow-lg">
             About Us
           </h1>
 
