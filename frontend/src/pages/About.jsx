@@ -164,6 +164,21 @@ export default function About() {
                   window.open("https://github.com/SumitSJ-2004", "_blank")
                 }
               />
+
+              <ProfileCard
+                name="Abhishek Nayak"
+                title="Frontend Developer"
+                handle="SumitSJ-2004"
+                contactText="Github Profile"
+                iconUrl="https://github.com/abhisheknayak7785.png"
+                avatarUrl="https://github.com/abhisheknayak7785.png"
+                showUserInfo={true}
+                enableTilt={true}
+                enableMobileTilt={true}
+                onContactClick={() =>
+                  window.open("https://github.com/abhisheknayak7785", "_blank")
+                }
+              />
             </div>
           </SpotlightCard>
         </section>
