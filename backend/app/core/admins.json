@@ -1,0 +1,17 @@
+[
+    {
+        "name": "Prince Sharma",
+        "email": "prince.sharma_owner@auralis.ac.in",
+        "password": "admin"
+    },
+    {
+        "name": "Ram Sharma",
+        "email": "ram.sharma_devops@auralis.ac.in",
+        "password": "admin"
+    },
+    {
+        "name": "Sameer Sharma",
+        "email": "sameer.sharma_dba@auralis.ac.in",
+        "password": "admin"
+    }
+]

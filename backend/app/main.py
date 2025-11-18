@@ -1,22 +1,19 @@
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI
-from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.schedulers.background import BackgroundScheduler # pyright: ignore[reportMissingTypeStubs]
 
-# Import routers (you can add these files later)
-# from api.v1 import candidates, recruiters, jobs, admin, match
-from api.v1 import candidates
-from api.v1 import recruiters
+from api.v1 import candidate
+from api.v1 import recruiter
 from api.v1 import admin
 from api.v1 import user
 from database.base import Base, engine
 from database.session import get_sync_session
 
-# Create all tables
-from models.application import Application
-from models.job import Job
-from models.recommendation import Recommendation
-from models.resume import Resume
-from models.token import Token
+from models.application import Application # pyright: ignore[reportUnusedImport]
+from models.job import Job # pyright: ignore[reportUnusedImport]
+from models.recommendation import Recommendation # pyright: ignore[reportUnusedImport]
+from models.resume import Resume # pyright: ignore[reportUnusedImport]
+from models.token import Token # pyright: ignore[reportUnusedImport]
 from models.user import User
 
 from schemas.user import UserCreate
@@ -43,42 +40,44 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# --- Include routers ---
-app.include_router(user.router, prefix="/api/v1/user", tags=["Candidates", "Recruiters", "Admin"])
-app.include_router(candidates.router, prefix="/api/v1/candidates", tags=["Candidates"])
-app.include_router(recruiters.router, prefix="/api/v1/recruiters", tags=["Recruiters"])
+app.include_router(user.router, prefix="/api/v1/user", tags=["User"])
+app.include_router(candidate.router, prefix="/api/v1/candidate", tags=["Candidate"])
+app.include_router(recruiter.router, prefix="/api/v1/recruiter", tags=["Recruiter"])
 app.include_router(admin.router, prefix="/api/v1/admin", tags=["Admin"])
-# app.include_router(jobs.router, prefix="/api/v1/jobs", tags=["Jobs"])
-# app.include_router(match.router, prefix="/api/v1/match", tags=["AI Matching"])
 
 def sync_admins():
     """Synchronize single admin from settings.ADMIN with database."""
 
     with get_sync_session() as db:
-        admin_data = settings.ADMIN
-        email = str(admin_data["email"])
-        name = str(admin_data["name"])
-        password = str(admin_data["password"])
+        for admin_data in settings.ADMINS:
+            email = str(admin_data["email"])
+            name = str(admin_data["name"])
+            password = str(admin_data["password"])
 
-        existing_admin = db.query(User).filter(User.role == "admin", User.email == email).first()
-
-        if not existing_admin:
-            create_user(
-                db=db,
-                user=UserCreate(name=name, email=email, password=password),
-                role="admin",
+            existing_admin = (
+                db.query(User)
+                .filter(User.role == "admin", User.email == email)
+                .first()
             )
-            db.commit()
 
-def start_scheduler():
+            if not existing_admin:
+                create_user(
+                    db=db,
+                    user=UserCreate(name=name, email=email, password=password),
+                    role="admin",
+                )
+        db.commit()
+
+def start_scheduler() -> BackgroundScheduler:
     scheduler = BackgroundScheduler()
-    scheduler.add_job(delete_expired_tokens, "interval", minutes=30)
-    scheduler.add_job(delete_deactivated_users, "interval", days=1)
-    scheduler.start()
+    if not scheduler:
+        scheduler.add_job(delete_expired_tokens, "interval", minutes=30)
+        scheduler.add_job(delete_deactivated_users, "interval", days=1)
+        scheduler.start()
     return scheduler
 
 sync_admins()
-scheduler = start_scheduler()
+scheduler: BackgroundScheduler = start_scheduler()
 
 if __name__ == "__main__":
     import uvicorn
@@ -86,4 +85,5 @@ if __name__ == "__main__":
     try:
         uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
     finally:
-        scheduler.shutdown()
+        if not scheduler:
+            scheduler.shutdown()

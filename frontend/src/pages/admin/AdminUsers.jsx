@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import UserTable from "../components/admin/UserTable";
+import UserTable from "../../components/admin/UserTable";
 
 export default function AdminUsers() {
   const [users, setUsers] = useState([]);

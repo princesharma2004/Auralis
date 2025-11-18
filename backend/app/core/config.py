@@ -1,6 +1,6 @@
 from pydantic_settings import BaseSettings
 from pydantic import Field
-from typing import Dict
+from typing import List, Dict
 from dotenv import load_dotenv
 from os import getenv
 import json
@@ -30,8 +30,8 @@ class Settings(BaseSettings):
         default_factory=lambda: int(getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "1440"))
     )
 
-    ADMIN: Dict[str, str] = Field(
-        default_factory=lambda: json.loads(getenv("ADMIN", '{"name": "admin", "email": "admin@example.com", "password": "admin"}'))
+    ADMINS: List[Dict[str, str]] = Field(
+        default_factory=lambda: json.load(open("core/admins.json", encoding="utf-8")) or []
     )
 
     class Config:

@@ -1,5 +1,5 @@
 from sqlalchemy import (
-    Column, Integer, String, Boolean, DateTime, Text, ARRAY, ForeignKey
+    Column, Integer, String, Boolean, DateTime, Text, ForeignKey
 )
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -13,7 +13,6 @@ class Job(Base):
     recruiter_id = Column(Integer, ForeignKey("users.id", ondelete="cascade"), nullable=False)
     title = Column(String(255), nullable=False)
     description = Column(Text)
-    required_skills = Column(ARRAY(String))
     location = Column(String(255), nullable=False)
     employment_type = Column(String(50))
     created_at = Column(DateTime(timezone=True), server_default=func.now())
