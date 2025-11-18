@@ -1,0 +1,23 @@
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import Home from "../pages/Home";
+import About from "../pages/About";
+import PageNotFound from "../pages/PageNotFound";
+import Login from "../pages/Login";
+import Signup from "../pages/Signup";
+import Contact from "../pages/Contact";
+
+export default function AppRoutes() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Navigate to="/home" replace />} />
+        <Route path="/home" element={<Home />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/Contact" element={<Contact />} />
+        {/* <Route path="*" element={<PageNotFound />} /> */}
+      </Routes>
+    </BrowserRouter>
+  );
+}
