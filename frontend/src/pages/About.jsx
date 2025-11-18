@@ -135,7 +135,7 @@ export default function About() {
 
               <ProfileCard
                 name="Yash Goyal"
-                title="Frontend Developer"
+                title="Software Developer"
                 handle="yash825-bit"
                 contactText="Github Profile"
                 iconUrl="https://github.com/yash825-bit.png"
@@ -150,7 +150,7 @@ export default function About() {
 
               <ProfileCard
                 name="Sumit Singh"
-                title="Frontend Developer"
+                title="programmer"
                 handle="SumitSJ-2004"
                 contactText="Github Profile"
                 iconUrl="https://github.com/SumitSJ-2004.png"
@@ -165,7 +165,7 @@ export default function About() {
 
               <ProfileCard
                 name="Abhishek Nayak"
-                title="Frontend Developer"
+                title="Programmer"
                 handle="SumitSJ-2004"
                 contactText="Github Profile"
                 iconUrl="https://github.com/abhisheknayak7785.png"

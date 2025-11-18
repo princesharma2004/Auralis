@@ -10,8 +10,7 @@ import AdminUsers from "../pages/admin/AdminUsers";
 import RecruiterDashboard from "../pages/recruiter/RecruiterDashboard";
 import CandidateDashboard from "../pages/candidate/CandidateDashboard";
 
-export default function MainRoutes()
-{
+export default function MainRoutes() {
   return (
     <BrowserRouter>
       <Routes>
@@ -20,22 +19,34 @@ export default function MainRoutes()
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
 
-        <Route path="/signup/*" element={<Navigate to="/signup/candidate" replace />} />
+        <Route
+          path="/signup/*"
+          element={<Navigate to="/signup/candidate" replace />}
+        />
         <Route path="/signup/:role" element={<Signup />} />
 
         <Route path="/login" element={<Login />} />
 
-        <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
+        <Route
+          path="/admin"
+          element={<Navigate to="/admin/dashboard" replace />}
+        />
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
         <Route path="/admin/dashboard/users" element={<AdminUsers />} />
 
-        <Route path="/recruiter" element={<Navigate to="/recruiter/dashboard" replace />} />
+        <Route
+          path="/recruiter"
+          element={<Navigate to="/recruiter/dashboard" replace />}
+        />
         <Route path="/recruiter/dashboard" element={<RecruiterDashboard />} />
 
-        <Route path="/candidate" element={<Navigate to="/candidate/dashboard" replace />} />
+        <Route
+          path="/candidate"
+          element={<Navigate to="/candidate/dashboard" replace />}
+        />
         <Route path="/candidate/dashboard" element={<CandidateDashboard />} />
 
-        <Route path="*" element={<PageNotFound />} />
+        {/* <Route path="*" element={<PageNotFound />} /> */}
       </Routes>
     </BrowserRouter>
   );
