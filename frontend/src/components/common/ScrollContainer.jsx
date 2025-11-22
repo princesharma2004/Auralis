@@ -195,7 +195,7 @@ export default function ScrollContainer() {
       <div className="fixed inset-0 z-0">
         <Aurora
           colorStops={["#3A29FF", "#FF94B4", "#FF3232"]}
-          blend={0}
+          blend={0.5}
           amplitude={0.6}
           speed={2}
         />
@@ -232,10 +232,10 @@ export default function ScrollContainer() {
         
         {/* Footer at the end */}
         <section 
-          className="snap-start snap-always min-h-screen w-full relative flex items-end justify-center"
-          style={{ scrollSnapAlign: "start" }}
+          className="snap-start snap-always w-full relative flex items-end justify-center"
+          style={{ scrollSnapAlign: "start", minHeight: "auto" }}
         >
-          <div className="w-full">
+          <div className="w-full py-8">
             <Footer />
           </div>
         </section>

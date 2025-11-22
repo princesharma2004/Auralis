@@ -20,8 +20,8 @@ export default function ContactContent() {
   };
 
   return (
-    <main className="relative min-h-screen text-slate-200 flex flex-col">
-      <div className="relative flex-1 flex items-center justify-center px-6 py-20">
+    <main className="relative text-slate-200 flex flex-col">
+      <div className="relative flex-1 flex items-center justify-center px-6 py-20 min-h-screen">
         <SpotlightCard
           className="w-full max-w-3xl rounded-2xl shadow-xl p-1 ring-1 ring-white/10 hover:ring-white/20 transition-all duration-300"
           spotlightColor="rgba(0, 229, 255, 0.2)"
@@ -111,7 +111,7 @@ export default function ContactContent() {
       </div>
 
       {/* Quote Section */}
-      <div className="relative flex items-center justify-center px-6 py-8 md:py-12">
+      <div className="relative flex items-center justify-center px-6 pt-8 pb-4 md:pt-12 md:pb-6">
         <div className="max-w-4xl mx-auto text-center">
           <div className="flex items-center justify-center gap-4 mb-6">
             <div className="w-12 md:w-16 h-[1px] bg-gradient-to-r from-transparent via-sky-400 to-transparent"></div>
@@ -121,7 +121,7 @@ export default function ContactContent() {
           <h2 className="text-3xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-[#40ffaa] via-[#4079ff] to-[#40ffaa] bg-[length:300%_300%] animate-gradient-text bg-clip-text text-transparent drop-shadow-lg leading-tight">
             Transform Your Hiring Journey With Us
           </h2>
-          <p className="mt-6 text-lg md:text-xl text-slate-300 max-w-2xl mx-auto">
+          <p className="mt-6 text-lg md:text-xl text-slate-300 max-w-2xl mx-auto pb-4">
             Where candidates discover their dream roles and recruiters find the perfect talent — all powered by intelligent matching
           </p>
         </div>

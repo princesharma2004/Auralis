@@ -59,7 +59,7 @@ export default function Signup() {
         <div className="auralis-aurora-bg">
           <Aurora
             colorStops={["#3A29FF", "#FF94B4", "#FF3232"]}
-            blend={0}
+            blend={0.5}
             amplitude={0.6}
             speed={2}
           />

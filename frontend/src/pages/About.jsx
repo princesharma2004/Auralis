@@ -12,7 +12,7 @@ export default function About() {
         <div className="absolute inset-0">
           <Aurora
             colorStops={["#3A29FF", "#FF94B4", "#FF3232"]}
-            blend={0}
+            blend={0.5}
             amplitude={0.6}
             speed={2}
           />
@@ -24,7 +24,7 @@ export default function About() {
         {/* About Section */}
         <section className="relative z-10 max-w-6xl mx-auto px-6 py-24 flex flex-col items-center text-center">
           {/* Title */}
-          <h1 className="text-3xl md:text-4xl text-center bg-gradient-to-r from-[#40ffaa] via-[#4079ff] to-[#40ffaa] bg-[length:300%_300%] animate-gradient-text bg-clip-text text-transparent drop-shadow-lg">
+          <h1 className="text-3xl md:text-4xl font-bold text-center bg-gradient-to-r from-[#40ffaa] via-[#4079ff] to-[#40ffaa] bg-[length:300%_300%] animate-gradient-text bg-clip-text text-transparent drop-shadow-lg">
             About Us
           </h1>
 
