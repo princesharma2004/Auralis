@@ -1,6 +1,49 @@
 import React from "react";
 import SpotlightCard from "../SpotlightCard";
-import ProfileCard from "../ProfileCard";
+
+// Custom Team Member Card Component
+const TeamMemberCard = ({ name, title, handle, avatarUrl, githubUrl }) => {
+  return (
+    <div
+      className="group relative w-full max-w-[180px] mx-auto cursor-pointer"
+      onClick={() => window.open(githubUrl, "_blank")}
+    >
+      <div className="relative rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 p-4 transition-all duration-300 hover:bg-white/10 hover:border-white/20 hover:scale-105 hover:shadow-lg hover:shadow-blue-500/20">
+        {/* Avatar */}
+        <div className="relative w-20 h-20 mx-auto mb-3 rounded-full overflow-hidden ring-2 ring-sky-400/30 group-hover:ring-sky-400/60 transition-all duration-300">
+          <img
+            src={avatarUrl}
+            alt={name}
+            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+            onError={(e) => {
+              e.target.src = "https://via.placeholder.com/80?text=" + name.charAt(0);
+            }}
+          />
+        </div>
+
+        {/* Name */}
+        <h3 className="text-center text-sm font-semibold text-sky-300 mb-1 group-hover:text-sky-200 transition-colors duration-300">
+          {name}
+        </h3>
+
+        {/* Title */}
+        <p className="text-center text-xs text-slate-400 mb-2 group-hover:text-slate-300 transition-colors duration-300">
+          {title}
+        </p>
+
+        {/* GitHub Handle */}
+        <div className="text-center">
+          <span className="text-xs text-slate-500 group-hover:text-sky-400 transition-colors duration-300">
+            @{handle}
+          </span>
+        </div>
+
+        {/* Hover Effect Overlay */}
+        <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-blue-500/0 to-cyan-500/0 group-hover:from-blue-500/10 group-hover:to-cyan-500/10 transition-all duration-300 pointer-events-none" />
+      </div>
+    </div>
+  );
+};
 
 export default function AboutContent() {
   return (
@@ -8,7 +51,7 @@ export default function AboutContent() {
       {/* About Section */}
       <section className="relative z-10 max-w-6xl mx-auto px-6 py-24 flex flex-col items-center text-center">
         {/* Title */}
-        <h1 className="text-3xl md:text-4xl text-center bg-gradient-to-r from-[#40ffaa] via-[#4079ff] to-[#40ffaa] bg-[length:300%_300%] animate-gradient-text bg-clip-text text-transparent drop-shadow-lg">
+        <h1 className="text-3xl md:text-4xl font-bold text-center bg-gradient-to-r from-[#40ffaa] via-[#4079ff] to-[#40ffaa] bg-[length:300%_300%] animate-gradient-text bg-clip-text text-transparent drop-shadow-lg">
           About Us
         </h1>
 
@@ -101,65 +144,37 @@ export default function AboutContent() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-10 justify-items-center">
-            <ProfileCard
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 lg:gap-10 justify-items-center max-w-6xl mx-auto px-4 mt-6">
+            <TeamMemberCard
               name="Prince Sharma"
               title="Software Engineer"
               handle="princesharma2004"
-              contactText="Github Profile"
-              iconUrl="https://github.com/princesharma2004.png"
               avatarUrl="https://github.com/princesharma2004.png"
-              showUserInfo={true}
-              enableTilt={true}
-              enableMobileTilt={true}
-              onContactClick={() =>
-                window.open("https://github.com/princesharma2004", "_blank")
-              }
+              githubUrl="https://github.com/princesharma2004"
             />
 
-            <ProfileCard
+            <TeamMemberCard
               name="Yash Goyal"
               title="Software Developer"
               handle="yash825-bit"
-              contactText="Github Profile"
-              iconUrl="https://github.com/yash825-bit.png"
               avatarUrl="https://github.com/yash825-bit.png"
-              showUserInfo={true}
-              enableTilt={true}
-              enableMobileTilt={true}
-              onContactClick={() =>
-                window.open("https://github.com/yash825-bit", "_blank")
-              }
+              githubUrl="https://github.com/yash825-bit"
             />
 
-            <ProfileCard
+            <TeamMemberCard
               name="Sumit Singh"
-              title="programmer"
-              handle="SumitSJ-2004"
-              contactText="Github Profile"
-              iconUrl="https://github.com/SumitSJ-2004.png"
-              avatarUrl="https://github.com/SumitSJ-2004.png"
-              showUserInfo={true}
-              enableTilt={true}
-              enableMobileTilt={true}
-              onContactClick={() =>
-                window.open("https://github.com/SumitSJ-2004", "_blank")
-              }
-            />
-
-            <ProfileCard
-              name="Abhishek Nayak"
               title="Programmer"
               handle="SumitSJ-2004"
-              contactText="Github Profile"
-              iconUrl="https://github.com/abhisheknayak7785.png"
+              avatarUrl="https://github.com/SumitSJ-2004.png"
+              githubUrl="https://github.com/SumitSJ-2004"
+            />
+
+            <TeamMemberCard
+              name="Abhishek Nayak"
+              title="Programmer"
+              handle="abhisheknayak7785"
               avatarUrl="https://github.com/abhisheknayak7785.png"
-              showUserInfo={true}
-              enableTilt={true}
-              enableMobileTilt={true}
-              onContactClick={() =>
-                window.open("https://github.com/abhisheknayak7785", "_blank")
-              }
+              githubUrl="https://github.com/abhisheknayak7785"
             />
           </div>
         </SpotlightCard>
