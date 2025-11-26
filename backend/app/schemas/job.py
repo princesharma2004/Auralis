@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Optional
 
 class JobBase(BaseModel):
-    title: str
+    title_id: int
     description: Optional[str]
     location: str
     employment_type: Optional[str]

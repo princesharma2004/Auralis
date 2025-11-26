@@ -20,5 +20,4 @@ class Job(Base):
     is_active = Column(Boolean, default=True)
 
     recruiter = relationship("User", back_populates="jobs")
-    recommendations = relationship("Recommendation", back_populates="job", cascade="all, delete")
     applications = relationship("Application", back_populates="job", cascade="all, delete")

@@ -21,6 +21,11 @@ def get_applications_by_candidate(db: Session, candidate_id: int) -> List[Applic
     return db.query(Application).filter(Application.candidate_id == candidate_id).all()
 
 
+def delete_applications_by_id(db: Session, application_id: int) -> None:
+    db.query(Application).filter(Application.id == application_id).delete(synchronize_session=False)
+    db.commit()
+
+
 def get_applications_by_job(db: Session, job_id: int) -> List[Application]:
     return db.query(Application).filter(Application.job_id == job_id).all()
 
