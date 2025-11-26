@@ -3,18 +3,18 @@ from datetime import datetime
 from typing import Optional
 
 class JobBase(BaseModel):
-    title_id: int
     description: Optional[str]
     location: str
     employment_type: Optional[str]
 
 
 class JobCreate(JobBase):
-    pass
+    title_id: int
 
 
 class JobResponse(JobBase):
     id: int
+    title: str
     recruiter_id: int
     created_at: datetime
 

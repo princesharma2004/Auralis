@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from typing import Optional
 
 from core.security import get_password_hash
@@ -28,7 +29,7 @@ def get_user(db: Session, user_id: int) -> Optional[User]:
 
 
 def get_users(db: Session, skip: int = 0, limit: int = 100) -> list[User]:
-    return db.query(User).offset(skip).limit(limit).all()
+    return db.query(User).filter(User.role != "admin").offset(skip).limit(limit).all()
 
 
 def activate_user(db: Session, user_id: int) -> None:
@@ -43,3 +44,15 @@ def deactivate_user(db: Session, user_id: int) -> None:
     if user:
         user.is_active = False
         db.commit()
+
+def get_total_users(db: Session) -> int:
+    return db.query(func.count(User.id)).filter(User.role != "admin").scalar()
+
+def get_total_active_users(db: Session) -> int:
+    return db.query(func.count(User.id)).filter(User.role != "admin").filter(User.is_active == True).scalar()
+
+def get_total_candidates(db: Session) -> int:
+    return db.query(func.count(User.id)).filter(User.role == "candidate").scalar()
+
+def get_total_recruiters(db: Session) -> int:
+    return db.query(func.count(User.id)).filter(User.role == "recruiter").scalar()

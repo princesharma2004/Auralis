@@ -30,10 +30,12 @@ export default function UserTable({ users = [] }) {
                 <td className="px-6 py-3">{u.email}</td>
                 <td className="px-6 py-3">
                   <span
-                    className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                      u.role === "Recruiter"
+                    className={`px-2 py-1 text-xs font-semibold rounded-full capitalize ${
+                      u.role === "recruiter"
                         ? "bg-indigo-600/30 text-indigo-300"
-                        : "bg-sky-600/30 text-sky-300"
+                        : u.role === "candidate"
+                        ? "bg-sky-600/30 text-sky-300"
+                        : "bg-purple-600/30 text-purple-300"
                     }`}
                   >
                     {u.role}
@@ -46,8 +48,12 @@ export default function UserTable({ users = [] }) {
                     <span className="text-rose-400 font-medium">No</span>
                   )}
                 </td>
-                <td className="px-6 py-3 text-slate-400">{u.created_at}</td>
-                <td className="px-6 py-3 text-slate-400">{u.updated_at}</td>
+                <td className="px-6 py-3 text-slate-400">
+                  {new Date(u.created_at).toLocaleString()}
+                </td>
+                <td className="px-6 py-3 text-slate-400">
+                  {new Date(u.updated_at).toLocaleString()}
+                </td>
               </tr>
             ))
           ) : (

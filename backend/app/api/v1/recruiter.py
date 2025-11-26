@@ -1,17 +1,16 @@
 from fastapi import APIRouter, HTTPException, status
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
-from typing import List, Any, cast
+from typing import List, Dict, Any, cast
 
 from core.security import decode_token, settings
 from crud.user import create_user, get_user_by_email, get_user
-from crud.job import create_job, delete_job, get_job, recruiter_jobs
+from crud.job import create_job, delete_job, get_job, recruiter_jobs, get_total_recruiter_jobs
 from crud.application import get_applications_by_job
 from crud.resume import get_resume_by_user
 from api.dependencies import get_db_session
 from schemas.user import UserCreate
 from schemas.job import JobCreate, JobResponse
-from models.job import Job
 
 
 router = APIRouter()
@@ -68,8 +67,8 @@ async def add_job(token: str, job: JobCreate, db: Session = get_db_session()) ->
     create_job(db, user_id, job)
 
 
-@router.get("/my_jobs", response_model=list[JobResponse])
-async def my_jobs(token: str, db: Session = get_db_session()) -> List[Job]:
+@router.get("/my_jobs")
+async def my_jobs(token: str, skip: int = 0, limit: int = 100, db: Session = get_db_session()) -> Dict[str, Any]:
     payload = decode_token(token)
     user_id = payload.get("sub")
     role = payload.get("role")
@@ -84,7 +83,17 @@ async def my_jobs(token: str, db: Session = get_db_session()) -> List[Job]:
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     
-    return recruiter_jobs(db, user_id)
+    jobs = recruiter_jobs(db, user_id)
+    total = get_total_recruiter_jobs(db, user_id)
+
+    return {
+        "data": [JobResponse.model_validate(j) for j in jobs],
+        "total": total,
+        "skip": skip,
+        "limit": limit,
+        "page": (skip // limit) + 1,
+        "total_pages": (total + limit - 1) // limit,
+    }
 
 
 @router.delete("/remove_job", status_code=status.HTTP_204_NO_CONTENT)

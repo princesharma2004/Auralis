@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "../styles/Login.css";
 import Aurora from "../components/common/Aurora";
 import MainLayout from "../layouts/MainLayout";
-import login from "../services/login";
+import login from "../services/user/login";
 
 export default function Login() {
   const [form, setForm] = useState({
@@ -17,7 +17,11 @@ export default function Login() {
   useEffect(() => {
     const rememberedEmail = localStorage.getItem("rememberedEmail");
     if (rememberedEmail) {
-      setForm((prev) => ({ ...prev, email: rememberedEmail, rememberMe: true }));
+      setForm((prev) => ({
+        ...prev,
+        email: rememberedEmail,
+        rememberMe: true,
+      }));
     }
   }, []);
 
@@ -117,7 +121,10 @@ export default function Login() {
                   onChange={handleChange}
                   className="cursor-pointer"
                 />
-                <label htmlFor="rememberMe" className="text-sm text-gray-200 cursor-pointer">
+                <label
+                  htmlFor="rememberMe"
+                  className="text-sm text-gray-200 cursor-pointer"
+                >
                   Remember me
                 </label>
               </div>
