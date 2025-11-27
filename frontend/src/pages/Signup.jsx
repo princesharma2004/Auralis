@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import "../styles/Signup.css";
 import Aurora from "../components/common/Aurora";
 import MainLayout from "../layouts/MainLayout";
+import signup from "../services/user/signup";
 
 const ROLES = ["Recruiter", "Candidate"];
 
@@ -12,7 +13,8 @@ export default function Signup() {
 
   // normalize role param, fallback to Candidate if invalid
   const initialRole =
-    roleParam && ROLES.map(r => r.toLowerCase()).includes(roleParam.toLowerCase())
+    roleParam &&
+    ROLES.map((r) => r.toLowerCase()).includes(roleParam.toLowerCase())
       ? roleParam.charAt(0).toUpperCase() + roleParam.slice(1).toLowerCase()
       : "Candidate";
 
@@ -28,7 +30,8 @@ export default function Signup() {
     navigate(`/signup/${role.toLowerCase()}`, { replace: true });
   }, [role, navigate]);
 
-  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (e) =>
+    setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -38,7 +41,7 @@ export default function Signup() {
     }
 
     const payload = {
-      role,
+      role: roleAccent,
       name: form.name,
       email: form.email,
       password: form.password,
@@ -46,9 +49,14 @@ export default function Signup() {
       ...(role === "Candidate" ? { phone: form.phone } : {}),
     };
 
-    console.log("Signup payload:", payload);
-    // TODO: send to API
-    navigate("/home");
+    signup(payload).then((response) => {
+      if (response.error) {
+        alert(response.message);
+      } else {
+        setForm({ name: "", email: "", password: "", confirmPassword: "" });
+        navigate("/login");
+      }
+    });
   };
 
   const roleAccent = role === "Recruiter" ? "recruiter" : "candidate";
@@ -66,10 +74,16 @@ export default function Signup() {
         </div>
 
         <div className="auralis-signup-container">
-          <div className={`auralis-signup-card ${roleAccent}`} data-role={role.toLowerCase()}>
-            
+          <div
+            className={`auralis-signup-card ${roleAccent}`}
+            data-role={role.toLowerCase()}
+          >
             {/* Role toggle */}
-            <div className="role-toggle" role="tablist" aria-label="Select role">
+            <div
+              className="role-toggle"
+              role="tablist"
+              aria-label="Select role"
+            >
               {ROLES.map((r, idx) => (
                 <button
                   key={r}
@@ -84,7 +98,9 @@ export default function Signup() {
               ))}
               <div
                 className="role-indicator"
-                style={{ transform: `translateX(${ROLES.indexOf(role) * 100}%)` }}
+                style={{
+                  transform: `translateX(${ROLES.indexOf(role) * 100}%)`,
+                }}
                 aria-hidden
               />
             </div>

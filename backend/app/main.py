@@ -11,7 +11,6 @@ from database.session import get_sync_session
 
 from models.application import Application # pyright: ignore[reportUnusedImport]
 from models.job import Job # pyright: ignore[reportUnusedImport]
-from models.recommendation import Recommendation # pyright: ignore[reportUnusedImport]
 from models.resume import Resume # pyright: ignore[reportUnusedImport]
 from models.token import Token # pyright: ignore[reportUnusedImport]
 from models.user import User

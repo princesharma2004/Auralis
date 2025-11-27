@@ -6,6 +6,7 @@ class ApplicationResponse(BaseModel):
     job_id: int
     candidate_id: int
     status: str
+    similarity_score: float
     applied_at: datetime
 
     class Config:

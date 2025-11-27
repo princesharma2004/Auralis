@@ -34,6 +34,10 @@ class Settings(BaseSettings):
         default_factory=lambda: json.load(open("core/admins.json", encoding="utf-8")) or []
     )
 
+    JOBS: List[str] = Field(
+        default_factory=lambda: json.load(open("core/jobs.json", encoding="utf-8")) or []
+    )
+
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
