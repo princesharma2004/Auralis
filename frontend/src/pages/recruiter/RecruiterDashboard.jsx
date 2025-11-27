@@ -389,103 +389,191 @@ export default function RecruiterDashboard() {
           )}
 
           {/* APPLICATIONS TAB */}
-          <div className="space-y-5">
-            {applications.map((app) => (
-              <SpotlightCard
-                key={app.application_id}
-                spotlightColor="rgba(255, 148, 180, 0.2)"
-                className="relative p-5 rounded-xl border border-white/10 shadow-lg hover:scale-[1.01] transition-all duration-200"
-              >
-                {/* Header */}
-                <div className="flex justify-between items-center">
-                  <p className="text-sm text-gray-300 font-medium">
-                    Application ID:{" "}
-                    <span className="text-pink-300">{app.application_id}</span>
+          {activeTab === "applications" && (
+            <div className="space-y-6">
+              <h2 className="text-2xl font-semibold text-pink-300 mb-4">
+                Applications
+              </h2>
+
+              {/* JOB SELECTOR */}
+              <div>
+                <label className="text-sm text-gray-300">Select Job</label>
+                <select
+                  value={selectedJobId || ""}
+                  onChange={(e) => setSelectedJobId(e.target.value)}
+                  className="w-full mt-2 bg-white/5 border border-white/10 px-4 py-3 rounded-lg text-white"
+                >
+                  <option value="">Select a job</option>
+                  {jobs.map((job) => (
+                    <option key={job.id} value={job.id}>
+                      #{job.id} {job.title}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* IF NO JOB SELECTED */}
+              {!selectedJobId && (
+                <SpotlightCard>
+                  <p className="text-center text-gray-400 py-10">
+                    Select a job to view applications.
                   </p>
+                </SpotlightCard>
+              )}
 
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                      app.status === "applied"
-                        ? "bg-yellow-500/20 text-yellow-300"
-                        : app.status === "accepted"
-                        ? "bg-green-500/20 text-green-300"
-                        : app.status === "rejected"
-                        ? "bg-red-500/20 text-red-300"
-                        : "bg-gray-500/20 text-gray-300"
-                    }`}
-                  >
-                    {app.status.toUpperCase()}
-                  </span>
+              {/* APPLICATION LIST */}
+              {selectedJobId && (
+                <div className="space-y-5">
+                  {applications.length === 0 ? (
+                    <SpotlightCard>
+                      <p className="text-center text-gray-400 py-10">
+                        No applications for this job.
+                      </p>
+                    </SpotlightCard>
+                  ) : (
+                    applications.map((app) => (
+                      <SpotlightCard
+                        key={app.application_id}
+                        spotlightColor="rgba(255, 148, 180, 0.2)"
+                        className="relative p-5 rounded-xl border border-white/10 shadow-lg hover:scale-[1.01] transition-all duration-200"
+                      >
+                        {/* Header */}
+                        <div className="flex justify-between items-center">
+                          <p className="text-sm text-gray-300 font-medium">
+                            Application ID:{" "}
+                            <span className="text-pink-300">
+                              {app.application_id}
+                            </span>
+                          </p>
+
+                          <span
+                            className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                              app.status === "applied"
+                                ? "bg-yellow-500/20 text-yellow-300"
+                                : app.status === "accepted"
+                                ? "bg-green-500/20 text-green-300"
+                                : app.status === "rejected"
+                                ? "bg-red-500/20 text-red-300"
+                                : "bg-gray-500/20 text-gray-300"
+                            }`}
+                          >
+                            {app.status.toUpperCase()}
+                          </span>
+                        </div>
+
+                        {/* Divider */}
+                        <div className="border-t border-white/5 my-3"></div>
+
+                        {/* Applicant Info */}
+                        <div className="space-y-1">
+                          <p className="text-sm text-gray-300">
+                            Applicant:{" "}
+                            <span className="text-pink-300 font-medium">
+                              {app.applicant_name}
+                            </span>
+                          </p>
+
+                          <p className="text-sm text-gray-400">
+                            Email: {app.email}
+                          </p>
+
+                          <p className="text-sm text-sky-300 font-medium">
+                            Match Score:{" "}
+                            {(app.similarity_score * 100).toFixed(2)}%
+                          </p>
+                        </div>
+
+                        {/* Divider */}
+                        <div className="border-t border-white/5 my-4"></div>
+
+                        {/* Buttons */}
+                        <div className="flex gap-3">
+                          {/* DOWNLOAD RESUME */}
+                          <button
+                            onClick={() =>
+                              downloadResume(
+                                app.resume_data,
+                                app.resume_filename
+                              )
+                            }
+                            className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-xs font-medium transition"
+                          >
+                            Download Resume
+                          </button>
+
+                          {/* ACCEPT */}
+                          <button
+                            disabled={app.status === "accepted"}
+                            onClick={async () => {
+                              const res = await updateApplicationStatus(
+                                app.application_id,
+                                "accepted"
+                              );
+                              if (!res.error) {
+                                alert("Application Accepted");
+                                loadApplications(selectedJobId);
+                              } else alert(res.message);
+                            }}
+                            className={`px-4 py-2 rounded-lg text-xs font-medium transition ${
+                              app.status === "accepted"
+                                ? "bg-gray-600 cursor-not-allowed opacity-60"
+                                : "bg-green-600 hover:bg-green-700"
+                            }`}
+                          >
+                            Accept
+                          </button>
+
+                          {/* APPLIED */}
+                          <button
+                            disabled={app.status === "applied"}
+                            onClick={async () => {
+                              const res = await updateApplicationStatus(
+                                app.application_id,
+                                "applied"
+                              );
+                              if (!res.error) {
+                                alert("Application status updated to Applied");
+                                loadApplications(selectedJobId);
+                              } else alert(res.message);
+                            }}
+                            className={`px-4 py-2 rounded-lg text-xs font-medium transition ${
+                              app.status === "applied"
+                                ? "bg-gray-600 cursor-not-allowed opacity-60"
+                                : "bg-yellow-600 hover:bg-yellow-700"
+                            }`}
+                          >
+                            Applied
+                          </button>
+
+                          {/* REJECT */}
+                          <button
+                            disabled={app.status === "rejected"}
+                            onClick={async () => {
+                              const res = await updateApplicationStatus(
+                                app.application_id,
+                                "rejected"
+                              );
+                              if (!res.error) {
+                                alert("Application Rejected");
+                                loadApplications(selectedJobId);
+                              } else alert(res.message);
+                            }}
+                            className={`px-4 py-2 rounded-lg text-xs font-medium transition ${
+                              app.status === "rejected"
+                                ? "bg-gray-600 cursor-not-allowed opacity-60"
+                                : "bg-red-600 hover:bg-red-700"
+                            }`}
+                          >
+                            Reject
+                          </button>
+                        </div>
+                      </SpotlightCard>
+                    ))
+                  )}
                 </div>
-
-                {/* Divider */}
-                <div className="border-t border-white/5 my-3"></div>
-
-                {/* Applicant Info */}
-                <div className="space-y-1">
-                  <p className="text-sm text-gray-300">
-                    Applicant:{" "}
-                    <span className="text-pink-300 font-medium">
-                      {app.applicant_name}
-                    </span>
-                  </p>
-
-                  <p className="text-sm text-gray-400">Email: {app.email}</p>
-
-                  <p className="text-sm text-sky-300 font-medium">
-                    Match Score: {(app.similarity_score * 100).toFixed(2)}%
-                  </p>
-                </div>
-
-                {/* Divider */}
-                <div className="border-t border-white/5 my-4"></div>
-
-                {/* Buttons */}
-                <div className="flex gap-3">
-                  <button
-                    onClick={() =>
-                      downloadResume(app.resume_data, app.resume_filename)
-                    }
-                    className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-xs font-medium transition"
-                  >
-                    Download Resume
-                  </button>
-
-                  <button
-                    onClick={async () => {
-                      const res = await updateApplicationStatus(
-                        app.application_id,
-                        "accepted"
-                      );
-                      if (!res.error) {
-                        alert("Application Accepted");
-                        loadApplications(selectedJobId);
-                      } else alert(res.message);
-                    }}
-                    className="px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-xs font-medium transition"
-                  >
-                    Accept
-                  </button>
-
-                  <button
-                    onClick={async () => {
-                      const res = await updateApplicationStatus(
-                        app.application_id,
-                        "rejected"
-                      );
-                      if (!res.error) {
-                        alert("Application Rejected");
-                        loadApplications(selectedJobId);
-                      } else alert(res.message);
-                    }}
-                    className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-xs font-medium transition"
-                  >
-                    Reject
-                  </button>
-                </div>
-              </SpotlightCard>
-            ))}
-          </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>
