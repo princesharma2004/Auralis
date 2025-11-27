@@ -9,6 +9,8 @@ import getMyJobs from "../../services/recruiter/getMyJobs";
 import createJob from "../../services/recruiter/createJob";
 import getJobTitles from "../../services/recruiter/getJobTitles";
 import deleteJob from "../../services/recruiter/deleteJob";
+import getJobApplications from "../../services/recruiter/getJobApplications";
+import updateApplicationStatus from "../../services/recruiter/updateApplicationStatus";
 
 export default function RecruiterDashboard() {
   const navigate = useNavigate();
@@ -22,8 +24,10 @@ export default function RecruiterDashboard() {
   const [totalJobs, setTotalJobs] = useState(0);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+
   const [selectedJobId, setSelectedJobId] = useState(null);
   const [applications, setApplications] = useState([]);
+
   const [newJob, setNewJob] = useState({
     title_id: "",
     description: "",
@@ -31,12 +35,22 @@ export default function RecruiterDashboard() {
     employment_type: "",
   });
 
-  // Navigate on tab change
+  // sync url
   useEffect(() => {
     navigate(`/recruiter/dashboard/${activeTab}`);
   }, [activeTab]);
 
-  // Load job titles when on create-job tab
+  // user me()
+  useEffect(() => {
+    (async () => {
+      const response = await me();
+      if (response.error) navigate("/login");
+      else setUser(response);
+      setLoading(false);
+    })();
+  }, []);
+
+  // load job titles dynamically
   useEffect(() => {
     if (activeTab === "create-job") loadJobTitles();
   }, [activeTab]);
@@ -46,71 +60,59 @@ export default function RecruiterDashboard() {
     if (!titles.error) setJobTitles(titles);
   };
 
-  // Load user info
+  // load jobs for my-jobs & applications job selector
   useEffect(() => {
-    loadUserData();
-  }, []);
-
-  const loadUserData = async () => {
-    const response = await me();
-    if (response.error) {
-      navigate("/login");
-    } else {
-      setUser(response);
-    }
-    setLoading(false);
-  };
-
-  // Load jobs when activeTab/page/limit changes
-  useEffect(() => {
-    if (activeTab === "my-jobs") loadJobs();
+    if (activeTab === "my-jobs" || activeTab === "applications") loadJobs();
   }, [activeTab, page, limit]);
 
   const loadJobs = async () => {
     setLoading(true);
     const skip = (page - 1) * limit;
-    const response = await getMyJobs(skip, limit);
-    if (!response.error) {
-      setJobs(response.data);
-      setTotalJobs(response.total);
+
+    const res = await getMyJobs(skip, limit);
+    if (!res.error) {
+      setJobs(res.data);
+      setTotalJobs(res.total);
     }
+
     setLoading(false);
   };
 
-  // Load applications when selected job changes
+  // load applications when job changes
   useEffect(() => {
-    if (selectedJobId) loadJobApplications(selectedJobId);
-    else setApplications([]);
-  }, [selectedJobId]);
+    if (activeTab === "applications" && selectedJobId) {
+      loadApplications(selectedJobId);
+    } else {
+      setApplications([]);
+    }
+  }, [selectedJobId, activeTab]);
 
-  const loadJobApplications = async (jobId) => {
+  const loadApplications = async (jobId) => {
     setLoading(true);
-    const response = await getJobApplications(jobId);
-    if (!response.error) setApplications(response);
+    const res = await getJobApplications(jobId);
+    if (!res.error) setApplications(res);
     setLoading(false);
   };
 
-  const handlePageChange = (newPage) => {
-    setPage(newPage);
-  };
-
-  const handleLimitChange = (newLimit) => {
-    setLimit(newLimit);
-    setPage(1);
+  const downloadResume = (base64Data, filename) => {
+    const link = document.createElement("a");
+    link.href = `data:application/octet-stream;base64,${base64Data}`;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const handleDeleteJob = async (jobId) => {
     if (!window.confirm("Are you sure you want to delete this job?")) return;
+    const res = await deleteJob(jobId);
 
-    const response = await deleteJob(jobId);
-
-    if (!response.error) {
+    if (!res.error) {
       alert("Job deleted successfully!");
-      // If deleted job is selected, clear selection
       if (selectedJobId === jobId) setSelectedJobId(null);
       loadJobs();
     } else {
-      alert(response.message);
+      alert(res.message);
     }
   };
 
@@ -118,12 +120,12 @@ export default function RecruiterDashboard() {
     e.preventDefault();
     setLoading(true);
 
-    const response = await createJob({
+    const res = await createJob({
       ...newJob,
       title_id: Number(newJob.title_id),
     });
 
-    if (!response.error) {
+    if (!res.error) {
       alert("Job created successfully!");
       setNewJob({
         title_id: "",
@@ -134,7 +136,7 @@ export default function RecruiterDashboard() {
       setActiveTab("my-jobs");
       loadJobs();
     } else {
-      alert(response.message || "Failed to create job");
+      alert(res.message);
     }
 
     setLoading(false);
@@ -148,14 +150,6 @@ export default function RecruiterDashboard() {
     localStorage.removeItem("userRole");
     navigate("/login");
   };
-
-  if (loading && !user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white">
-        <div className="text-xl">Loading...</div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gray-900 text-white relative overflow-hidden">
@@ -182,6 +176,7 @@ export default function RecruiterDashboard() {
                 </p>
               )}
             </div>
+
             <button
               onClick={handleLogout}
               className="px-4 py-2 rounded-lg bg-red-600/80 hover:bg-red-600 transition-colors"
@@ -194,26 +189,26 @@ export default function RecruiterDashboard() {
         <div className="max-w-7xl mx-auto px-6 py-6">
           {/* TABS */}
           <div className="flex gap-4 mb-6 border-b border-white/10">
-            {["my-jobs", "create-job"].map((tabName) => (
+            {["my-jobs", "create-job", "applications"].map((t) => (
               <button
-                key={tabName}
+                key={t}
                 onClick={() => {
-                  setActiveTab(tabName);
+                  setActiveTab(t);
                   setSelectedJobId(null);
                   setApplications([]);
                 }}
                 className={`px-6 py-3 capitalize font-medium transition-colors border-b-2 ${
-                  activeTab === tabName
+                  activeTab === t
                     ? "border-pink-400 text-pink-300"
                     : "border-transparent text-gray-400 hover:text-gray-200"
                 }`}
               >
-                {tabName.replace("-", " ")}
+                {t.replace("-", " ")}
               </button>
             ))}
           </div>
 
-          {/* CREATE JOB */}
+          {/* CREATE JOB TAB */}
           {activeTab === "create-job" && (
             <div className="space-y-6">
               <h2 className="text-2xl font-semibold text-pink-300 mb-4">
@@ -222,9 +217,9 @@ export default function RecruiterDashboard() {
 
               <SpotlightCard spotlightColor="rgba(255, 148, 180, 0.2)">
                 <form onSubmit={handleCreateJob} className="space-y-4">
-                  {/* JOB TITLE DROPDOWN */}
+                  {/* Title */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                    <label className="block text-sm mb-2 text-gray-300">
                       Job Title *
                     </label>
                     <select
@@ -233,7 +228,7 @@ export default function RecruiterDashboard() {
                       onChange={(e) =>
                         setNewJob({ ...newJob, title_id: e.target.value })
                       }
-                      className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-pink-400"
+                      className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white"
                     >
                       <option value="">Select Job Title</option>
                       {jobTitles.map((t, idx) => (
@@ -244,42 +239,37 @@ export default function RecruiterDashboard() {
                     </select>
                   </div>
 
-                  {/* DESCRIPTION */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
-                      Description
-                    </label>
-                    <textarea
-                      value={newJob.description}
-                      onChange={(e) =>
-                        setNewJob({ ...newJob, description: e.target.value })
-                      }
-                      className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-pink-400"
-                      rows="6"
-                      placeholder="Job description..."
-                    />
-                  </div>
+                  {/* Description */}
+                  <textarea
+                    rows="6"
+                    placeholder="Job description..."
+                    value={newJob.description}
+                    onChange={(e) =>
+                      setNewJob({ ...newJob, description: e.target.value })
+                    }
+                    className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white"
+                  />
 
-                  {/* LOCATION / EMPLOYMENT TYPE */}
+                  {/* Location & Type */}
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                      <label className="block text-sm mb-2 text-gray-300">
                         Location *
                       </label>
                       <input
-                        type="text"
                         required
+                        type="text"
+                        placeholder="Remote, New York, etc."
                         value={newJob.location}
                         onChange={(e) =>
                           setNewJob({ ...newJob, location: e.target.value })
                         }
-                        className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-pink-400"
-                        placeholder="e.g., Remote, New York, NY"
+                        className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                      <label className="block text-sm mb-2 text-gray-300">
                         Employment Type
                       </label>
                       <select
@@ -290,13 +280,13 @@ export default function RecruiterDashboard() {
                             employment_type: e.target.value,
                           })
                         }
-                        className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-pink-400"
+                        className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white"
                       >
                         <option value="">Select type</option>
-                        <option value="Full-time">Full-time</option>
-                        <option value="Part-time">Part-time</option>
-                        <option value="Contract">Contract</option>
-                        <option value="Internship">Internship</option>
+                        <option>Full-time</option>
+                        <option>Part-time</option>
+                        <option>Contract</option>
+                        <option>Internship</option>
                       </select>
                     </div>
                   </div>
@@ -304,7 +294,7 @@ export default function RecruiterDashboard() {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full px-4 py-2 rounded-lg bg-pink-600 hover:bg-pink-700 transition-colors disabled:opacity-50"
+                    className="w-full px-4 py-2 rounded-lg bg-pink-600 hover:bg-pink-700 disabled:opacity-50"
                   >
                     {loading ? "Creating..." : "Create Job"}
                   </button>
@@ -313,7 +303,7 @@ export default function RecruiterDashboard() {
             </div>
           )}
 
-          {/* MY JOBS */}
+          {/* MY JOBS TAB */}
           {activeTab === "my-jobs" && (
             <div className="space-y-6">
               <h2 className="text-2xl font-semibold text-pink-300">
@@ -321,11 +311,11 @@ export default function RecruiterDashboard() {
               </h2>
 
               {loading ? (
-                <div className="text-center py-12">Loading jobs...</div>
+                <div className="text-center py-8">Loading jobs...</div>
               ) : jobs.length === 0 ? (
                 <SpotlightCard>
                   <p className="text-center text-gray-400">
-                    You haven't posted any jobs yet.
+                    You have no job postings yet.
                   </p>
                 </SpotlightCard>
               ) : (
@@ -333,100 +323,169 @@ export default function RecruiterDashboard() {
                   {jobs.map((job) => (
                     <SpotlightCard
                       key={job.id}
-                      className="hover:scale-[1.01] transition-all duration-300 cursor-pointer"
                       spotlightColor="rgba(255, 148, 180, 0.2)"
-                      onClick={() =>
-                        setSelectedJobId(
-                          selectedJobId === job.id ? null : job.id
-                        )
-                      }
+                      className="hover:scale-[1.01] transition"
                     >
-                      <div className="space-y-4">
-                        <div className="flex justify-between items-start">
-                          <div className="flex-1">
-                            <h3 className="text-xl font-semibold text-pink-300 mb-2">
-                              {job.title}
-                            </h3>
-                            <p className="text-sm text-gray-400 mb-1">
-                              📍 {job.location}
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <h3 className="text-xl font-semibold text-pink-300">
+                            {job.title}
+                          </h3>
+                          <p className="text-gray-400 text-sm">
+                            📍 {job.location}
+                          </p>
+                          {job.employment_type && (
+                            <p className="text-sm text-gray-400 mb-2">
+                              💼 {job.employment_type}
                             </p>
-                            {job.employment_type && (
-                              <p className="text-sm text-gray-400 mb-2">
-                                💼 {job.employment_type}
-                              </p>
-                            )}
-                            {job.description && (
-                              <p className="text-gray-300 text-sm mt-2 line-clamp-2">
-                                {job.description}
-                              </p>
-                            )}
-                            <p className="text-xs text-gray-500 mt-2">
-                              Posted:{" "}
-                              {new Date(job.created_at).toLocaleDateString()}
+                          )}
+                          {job.description && (
+                            <p className="text-gray-300 text-sm mt-2 line-clamp-2">
+                              {job.description}
                             </p>
-                          </div>
-                          <div className="flex flex-col items-end gap-2">
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleDeleteJob(job.id);
-                              }}
-                              className="px-2 py-1 text-xs rounded bg-red-600/80 hover:bg-red-600 transition"
-                            >
-                              Delete
-                            </button>
-                          </div>
+                          )}
+                          <p className="text-xs text-gray-500 mt-2">
+                            Posted:{" "}
+                            {new Date(job.created_at).toLocaleDateString()}
+                          </p>
                         </div>
 
-                        {selectedJobId === job.id && (
-                          <div className="pt-4 border-t border-white/10">
-                            <h4 className="text-lg font-semibold text-pink-300 mb-4">
-                              Applications
-                            </h4>
-                            {applications.length === 0 ? (
-                              <p className="text-gray-400">
-                                No applications yet.
-                              </p>
-                            ) : (
-                              <div className="space-y-3">
-                                {applications.map((app) => (
-                                  <div
-                                    key={app.id}
-                                    className="bg-white/5 rounded-lg p-4 border border-white/10"
-                                  >
-                                    <p className="text-sm text-gray-300">
-                                      Application ID: {app.id}
-                                    </p>
-                                    <p className="text-sm text-gray-400">
-                                      Candidate ID: {app.candidate_id}
-                                    </p>
-                                    <p className="text-xs text-gray-500 mt-1">
-                                      Applied:{" "}
-                                      {new Date(
-                                        app.applied_at
-                                      ).toLocaleDateString()}
-                                    </p>
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        )}
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleDeleteJob(job.id)}
+                            className="px-2 py-1 text-xs rounded bg-red-600 hover:bg-red-700"
+                          >
+                            Delete
+                          </button>
+
+                          <button
+                            onClick={() => {
+                              setSelectedJobId(job.id);
+                              setActiveTab("applications");
+                            }}
+                            className="px-2 py-1 text-xs rounded bg-blue-600 hover:bg-blue-700"
+                          >
+                            Show Applications
+                          </button>
+                        </div>
                       </div>
                     </SpotlightCard>
                   ))}
                 </div>
               )}
+
               <Pagination
                 page={page}
                 totalPages={Math.ceil(totalJobs / limit)}
-                onPageChange={handlePageChange}
+                onPageChange={setPage}
                 limit={limit}
-                onLimitChange={handleLimitChange}
+                onLimitChange={(l) => {
+                  setLimit(l);
+                  setPage(1);
+                }}
                 total={totalJobs}
               />
             </div>
           )}
+
+          {/* APPLICATIONS TAB */}
+          <div className="space-y-5">
+            {applications.map((app) => (
+              <SpotlightCard
+                key={app.application_id}
+                spotlightColor="rgba(255, 148, 180, 0.2)"
+                className="relative p-5 rounded-xl border border-white/10 shadow-lg hover:scale-[1.01] transition-all duration-200"
+              >
+                {/* Header */}
+                <div className="flex justify-between items-center">
+                  <p className="text-sm text-gray-300 font-medium">
+                    Application ID:{" "}
+                    <span className="text-pink-300">{app.application_id}</span>
+                  </p>
+
+                  <span
+                    className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                      app.status === "applied"
+                        ? "bg-yellow-500/20 text-yellow-300"
+                        : app.status === "accepted"
+                        ? "bg-green-500/20 text-green-300"
+                        : app.status === "rejected"
+                        ? "bg-red-500/20 text-red-300"
+                        : "bg-gray-500/20 text-gray-300"
+                    }`}
+                  >
+                    {app.status.toUpperCase()}
+                  </span>
+                </div>
+
+                {/* Divider */}
+                <div className="border-t border-white/5 my-3"></div>
+
+                {/* Applicant Info */}
+                <div className="space-y-1">
+                  <p className="text-sm text-gray-300">
+                    Applicant:{" "}
+                    <span className="text-pink-300 font-medium">
+                      {app.applicant_name}
+                    </span>
+                  </p>
+
+                  <p className="text-sm text-gray-400">Email: {app.email}</p>
+
+                  <p className="text-sm text-sky-300 font-medium">
+                    Match Score: {(app.similarity_score * 100).toFixed(2)}%
+                  </p>
+                </div>
+
+                {/* Divider */}
+                <div className="border-t border-white/5 my-4"></div>
+
+                {/* Buttons */}
+                <div className="flex gap-3">
+                  <button
+                    onClick={() =>
+                      downloadResume(app.resume_data, app.resume_filename)
+                    }
+                    className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-xs font-medium transition"
+                  >
+                    Download Resume
+                  </button>
+
+                  <button
+                    onClick={async () => {
+                      const res = await updateApplicationStatus(
+                        app.application_id,
+                        "accepted"
+                      );
+                      if (!res.error) {
+                        alert("Application Accepted");
+                        loadApplications(selectedJobId);
+                      } else alert(res.message);
+                    }}
+                    className="px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-xs font-medium transition"
+                  >
+                    Accept
+                  </button>
+
+                  <button
+                    onClick={async () => {
+                      const res = await updateApplicationStatus(
+                        app.application_id,
+                        "rejected"
+                      );
+                      if (!res.error) {
+                        alert("Application Rejected");
+                        loadApplications(selectedJobId);
+                      } else alert(res.message);
+                    }}
+                    className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-xs font-medium transition"
+                  >
+                    Reject
+                  </button>
+                </div>
+              </SpotlightCard>
+            ))}
+          </div>
         </div>
       </div>
     </div>

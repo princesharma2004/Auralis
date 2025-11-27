@@ -4,6 +4,7 @@ from sqlalchemy import func
 
 from core.security import settings
 from models.job import Job
+from models.application import Application
 from schemas.job import JobCreate
 
 def create_job(db: Session, recruiter_id: int, job: JobCreate) -> Job:
@@ -27,6 +28,25 @@ def delete_job(db: Session, job_id: int) -> None:
 
 def recruiter_jobs(db: Session, recruiter_id: int) -> List[Job]:
     return db.query(Job).filter(Job.recruiter_id == recruiter_id).all()
+
+
+def candidate_jobs(db: Session, candidate_id: int, skip: int, limit: int):
+    applied_job_ids = (
+        db.query(Application.job_id)
+        .filter(Application.candidate_id == candidate_id)
+    )
+
+    return db.query(Job).filter(Job.id.notin_(applied_job_ids)).offset(skip).limit(limit).all()
+
+
+def get_total_candidate_jobs(db: Session, candidate_id: int) -> int:
+    applied_job_ids = (
+        db.query(Application.job_id)
+        .filter(Application.candidate_id == candidate_id)
+    )
+
+    return db.query(func.count(Job.id)).filter(Job.id.notin_(applied_job_ids)).scalar()
+
 
 def get_total_recruiter_jobs(db: Session, recruiter_id: int) -> int:
     return db.query(func.count(Job.id)).filter(Job.recruiter_id == recruiter_id).scalar()

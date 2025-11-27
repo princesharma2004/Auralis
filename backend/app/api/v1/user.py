@@ -44,36 +44,6 @@ def login(user: UserLogin, db: Session = get_db_session()) -> Dict[str, str]:
     return {"token": str(refresh_entry.refresh_token_hash), "role": str(existing.role)}
 
 
-@router.post('/refresh')
-async def refresh_token(token: str, db: Session = get_db_session()) -> Dict[str, str]:
-    """Refresh JWT access token using refresh token."""
-    payload = decode_token(token)
-    user_id = payload.get("sub")
-    if not user_id:
-        raise HTTPException(status_code=401, detail='Invalid token')
-    
-    user = get_user(db, user_id)
-    if not user:
-        raise HTTPException(status_code=404, detail='User not found')
-
-    new_access_token = create_access_token(
-        data={
-            "sub": str(user_id),
-            "email": payload.get("email"),
-            "role": payload.get("role"),
-            "iat": datetime.now(timezone.utc),
-        }
-    )
-
-    refresh_entry = create_refresh_token(
-        db,
-        user_id=int(user_id),
-        refresh_token_hash=new_access_token,
-    )
-
-    return {"token": str(refresh_entry.refresh_token_hash)}
-
-
 @router.get('/me', response_model=UserResponse)
 async def get_current_user(token: str, db: Session = get_db_session()) -> User:
     """Get current user information."""

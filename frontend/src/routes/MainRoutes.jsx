@@ -45,7 +45,7 @@ export default function MainRoutes() {
           path="/candidate"
           element={<Navigate to="/candidate/dashboard/jobs" replace />}
         />
-        <Route path="/candidate/dashboard:tab?/:page?" element={<CandidateDashboard />} />
+        <Route path="/candidate/dashboard/:tab?/:page?" element={<CandidateDashboard />} />
 
         <Route path="*" element={<PageNotFound />} />
       </Routes>

@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, status, UploadFile, File
 from fastapi.responses import FileResponse
 from datetime import datetime, timezone
-from typing import List, cast
+from typing import Dict, Any, cast
 from os import makedirs, path, remove
 import aiofiles
 from sqlalchemy.orm import Session
@@ -9,14 +9,13 @@ from sqlalchemy.orm import Session
 from core.security import decode_token
 from crud.user import create_user, get_user, get_user_by_email
 from crud.resume import create_resume
-from crud.job import get_jobs, get_job
-from crud.application import apply_for_job, delete_applications_by_id
+from crud.job import get_job, candidate_jobs, get_total_candidate_jobs
+from crud.application import apply_for_job, delete_applications_by_id, get_applications_by_candidate, get_total_applications_by_candidate
 from api.dependencies import get_db_session
 from schemas.user import UserCreate
 from schemas.job import JobResponse
 from schemas.application import ApplicationResponse
 from models.resume import Resume
-from models.job import Job
 from models.application import Application
 
 
@@ -56,8 +55,8 @@ async def upload_resume(token: str, file: UploadFile = File(...), db: Session = 
     if not file or not file.filename:
         raise HTTPException(status_code=400, detail="File not provided")
 
-    if not file.filename.lower().endswith((".pdf", ".doc", ".docx")):
-        raise HTTPException(status_code=400, detail="Invalid file type. Only PDF/DOC/DOCX allowed.")
+    if not file.filename.lower().endswith((".pdf")):
+        raise HTTPException(status_code=400, detail="Invalid file type. Only PDF allowed.")
 
     old_resume = db.query(Resume).filter(Resume.user_id == user_id).first()
     if old_resume:
@@ -153,8 +152,8 @@ async def delete_my_resume(token: str, db: Session = get_db_session()) -> None:
     db.commit()
 
 
-@router.get('/jobs', response_model=list[JobResponse])
-async def list_jobs(token: str, skip: int = 0, limit: int = 100, db: Session = get_db_session()) -> List[Job]:
+@router.get('/jobs')
+async def list_jobs(token: str, skip: int = 0, limit: int = 100, db: Session = get_db_session()) -> Dict[str, Any]:
     """List jobs with pagination."""
     payload = decode_token(token)
     user_id = payload.get("sub")
@@ -169,8 +168,17 @@ async def list_jobs(token: str, skip: int = 0, limit: int = 100, db: Session = g
     if user_role != "candidate":
         raise HTTPException(status_code=403, detail="Access denied: only candidates can see jobs.")
 
-    jobs = get_jobs(db, skip=skip, limit=limit)
-    return jobs
+    jobs = candidate_jobs(db, user_id, skip, limit)
+    total = get_total_candidate_jobs(db, user_id)
+
+    return {
+        "data": [JobResponse.model_validate(j) for j in jobs],
+        "total": total,
+        "skip": skip,
+        "limit": limit,
+        "page": (skip // limit) + 1,
+        "total_pages": (total + limit - 1) // limit,
+    }
 
 
 @router.post("/apply_job", response_model=ApplicationResponse)
@@ -219,3 +227,33 @@ async def delete_application(token: str, app_id: int, db: Session = get_db_sessi
         raise HTTPException(status_code=404, detail='Application not found.')
     
     delete_applications_by_id(db, app_id)
+
+@router.get("/my_applications")
+async def my_applications(token: str, skip: int = 0, limit: int = 100, db: Session = get_db_session()) -> Dict[str, Any]:
+    """
+    Get all applications submitted by the currently logged-in candidate.
+    """
+    payload = decode_token(token)
+    user_id = payload.get("sub")
+    if not user_id:
+        raise HTTPException(status_code=401, detail="Invalid token")
+    
+    user = get_user(db, user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    user_role = payload.get("role")
+    if user_role != "candidate":
+        raise HTTPException(status_code=403, detail="Access denied: only candidates can view their applications")
+    
+    applications = get_applications_by_candidate(db, user_id, skip, limit)
+    total = get_total_applications_by_candidate(db, user_id)
+
+    return {
+        "data": [ApplicationResponse.model_validate(a) for a in applications],
+        "total": total,
+        "skip": skip,
+        "limit": limit,
+        "page": (skip // limit) + 1,
+        "total_pages": (total + limit - 1) // limit,
+    }
